@@ -1,4 +1,4 @@
-#
+#  WAP to calculate the total cost of painting. The interior of building with four equal sized wall.
 
 side = int(input("Enter side length of interior wall :"))
 cost = int(input("Enter cost of painting per meter :"))
