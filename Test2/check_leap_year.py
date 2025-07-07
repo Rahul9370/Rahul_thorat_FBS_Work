@@ -1,5 +1,4 @@
-#
-#
+# WAP to accept year from user and check if it is a leap year or not.
 
 year = int(input("Enter Year :"))
 
