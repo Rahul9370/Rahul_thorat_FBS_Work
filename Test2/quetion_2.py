@@ -1,5 +1,5 @@
-#
-#
+# WAP a program to accept a three digit number from user and check 
+# if the second digit is double of first and first is double of third digit.
 
 number = int(input("Enter any Three digit Number :"))
 
