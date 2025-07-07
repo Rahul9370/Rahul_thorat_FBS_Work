@@ -1,4 +1,4 @@
-#
+# A man goes for shopping and buys 5 products. He needs to calculate the total bill amount including 18% GST.
 
 product_1 = int(input("Enter the price of product 1: "))
 product_2 = int(input("Enter the price of product 2: "))
