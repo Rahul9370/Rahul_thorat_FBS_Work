@@ -1,6 +1,6 @@
 # 11. WAP to check if given number Strong Number.
 
-number = int(input("Enter number to check Armstrong number :"))
+number = int(input("Enter number to check Strong number :"))
 
 original_num = number
 sum = 0
@@ -14,9 +14,9 @@ while(number > 0):
     sum += factorial
      
 if(sum == original_num):
-    print("Armstrong number")
+    print("Strong number")
 else:
-    print("Not Armstrong number")
+    print("Not strong number")
 
 
  
