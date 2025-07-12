@@ -1,6 +1,6 @@
 # 12. WAP to print Armstrong number within a given range
 
-number = int(input("Enter Number :"))
+number = int(input("Enter Number to check armstrong number :"))
 original_number = number
 count = 0
 sum = 0
