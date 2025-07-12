@@ -19,28 +19,4 @@ else:
     print("Not Armstrong number")
 
 
-
-
-
-
-# num = int(input("Enter a number: "))
-# original = num
-# sum = 0
-
-# while num > 0:
-#     digit = num % 10
-
-#     # Factorial calculate karna manually
-#     fact = 1
-#     i = 1
-#     while i <= digit:
-#         fact = fact * i
-#         i = i + 1
-
-#     sum = sum + fact
-#     num = num // 10
-
-# if sum == original:
-#     print(original, "is a Strong Number")
-# else:
-#     print(original, "is not a Strong Number")
+ 
