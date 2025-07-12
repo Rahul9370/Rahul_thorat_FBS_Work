@@ -7,13 +7,12 @@ sum = 0
 
 while(number > 0):
     a = number % 10
+    number //= 10
     factorial = 1
     for i in range(1 , a+1):
         factorial *= i
-
     sum += factorial
-    number //= 10 
-
+     
 if(sum == original_num):
     print("Armstrong number")
 else:
