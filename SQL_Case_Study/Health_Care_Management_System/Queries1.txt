@@ -1,0 +1,900 @@
+mysql> create database healthcare;
+Query OK, 1 row affected (0.02 sec)
+ 
+mysql> use healthcare;
+Database changed
+
+mysql> CREATE TABLE PATIENT (
+    ->     patient_id INT PRIMARY KEY,
+    ->     first_name VARCHAR(50),
+    ->     last_name VARCHAR(50),
+    ->     dob DATE,
+    ->     gender VARCHAR(10),
+    ->     phone VARCHAR(15),
+    ->     email VARCHAR(100),
+    ->     address VARCHAR(255)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE INSURANCE (
+    ->     insurance_id INT PRIMARY KEY,
+    ->     patient_id INT,
+    ->     provider_name VARCHAR(100),
+    ->     policy_number VARCHAR(50),
+    ->     coverage_start DATE,
+    ->     coverage_end DATE
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE DOCTOR (
+    ->     doctor_id INT PRIMARY KEY,
+    ->     first_first_name VARCHAR(50),
+    ->     last_name VARCHAR(50),
+    ->     specialization VARCHAR(100),
+    ->     mobile_number VARCHAR(15),
+    ->     email VARCHAR(100)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE ENCOUNTER (
+    ->     encounter_id INT PRIMARY KEY,
+    ->     patient_id INT,
+    ->     doctor_id INT,
+    ->     encounter_date DATE,
+    ->     encounter_type VARCHAR(50),
+    ->     notes VARCHAR(255)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> CREATE TABLE MEDICAL_HISTORY (
+    ->     history_id INT PRIMARY KEY,
+    ->     patient_id INT,
+    ->     condition_name VARCHAR(100),
+    ->     description VARCHAR(255),
+    ->     diagnosed_date DATE,
+    ->     status VARCHAR(50)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE MEDICATION (
+    ->     medication_id INT PRIMARY KEY,
+    ->     name VARCHAR(100),
+    ->     form VARCHAR(50),
+    ->     strength VARCHAR(50),
+    ->     unit VARCHAR(20)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE PRESCRIPTION (
+    ->     prescription_id INT PRIMARY KEY,
+    ->     encounter_id INT,
+    ->     prescription_date DATE
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE PRESCRIPTION_ITEM (
+    ->     item_id INT PRIMARY KEY,
+    ->     prescription_id INT,
+    ->     medication_id INT,
+    ->     dosage VARCHAR(50),
+    ->     quantity_per_day INT,
+    ->     duration_days INT,
+    ->     instructions VARCHAR(255)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE TEST_MASTER (
+    ->     test_id INT PRIMARY KEY,
+    ->     test_name VARCHAR(100),
+    ->     category VARCHAR(50)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE PATIENT_TEST (
+    ->     patient_test_id INT PRIMARY KEY,
+    ->     encounter_id INT,
+    ->     test_id INT,
+    ->     test_date DATE,
+    ->     status VARCHAR(50)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> CREATE TABLE TEST_RESULT (
+    ->     result_id INT PRIMARY KEY,
+    ->     patient_test_id INT,
+    ->     result_value VARCHAR(100),
+    ->     units VARCHAR(50),
+    ->     normal_range VARCHAR(50),
+    ->     result_date DATE
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> CREATE TABLE PROCEDURE_MASTER (
+    ->     procedure_id INT PRIMARY KEY,
+    ->     procedure_name VARCHAR(100),
+    ->     description VARCHAR(255)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE PATIENT_PROCEDURE (
+    ->     patient_procedure_id INT PRIMARY KEY,
+    ->     encounter_id INT,
+    ->     procedure_id INT,
+    ->     doctor_id INT,
+    ->     procedure_date DATE,
+    ->     procedure_status VARCHAR(50)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> alter table insurance
+    -> add foreign key (patient_id)
+    -> references patient (patient_id);
+Query OK, 0 rows affected (0.07 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table medical_history
+    -> add foreign key (patient_id)
+    -> references patient (patient_id);
+Query OK, 0 rows affected (0.11 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table encounter
+    -> add foreign key (patient_id)
+    -> references patient (patient_id);
+Query OK, 0 rows affected (0.09 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table prescription
+    -> add foreign key (encounter_id)
+    -> references encounter (encounter_id);
+Query OK, 0 rows affected (0.07 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table prescription_item
+    -> add foreign key (prescription_id)
+    -> references prescription (prescription_id);
+Query OK, 0 rows affected (0.08 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table prescription_item
+    -> add foreign key (medication_id)
+    -> references medication (medication_id);
+Query OK, 0 rows affected (0.09 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+ 
+mysql> alter table encounter
+    -> add foreign key (doctor_id)
+    -> references doctor (doctor_id);
+Query OK, 0 rows affected (0.10 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+ 
+mysql> alter table patient_procedure
+    -> add foreign key (doctor_id)
+    -> references doctor (doctor_id),
+    -> add foreign key (procedure_id)
+    -> references procedure_master (procedure_id),
+    -> add foreign key (encounter_id)
+    -> references encounter (encounter_id);
+Query OK, 0 rows affected (0.12 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table patient_test
+    -> add foreign key (encounter_id)
+    -> references encounter (encounter_id),
+    -> add foreign key (test_id)
+    -> references test_master (test_id);
+Query OK, 0 rows affected (0.09 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table test_result
+    -> add foreign key (patient_test_id)
+    -> references patient_test (patient_test_id);
+Query OK, 0 rows affected (0.11 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+
+mysql> INSERT INTO PATIENT (patient_id, first_name, last_name, dob, gender, phone, email, address) VALUES
+    -> (1, 'Rahul', 'Sharma', '1999-05-12', 'Male', '9876543201', 'rahul.sharma@example.com', 'Pune, Maharashtra'),
+    -> (2, 'Sneha', 'Patil', '2000-09-21', 'Female', '9822334102', 'sneha.patil@example.com', 'Mumbai, Maharashtra'),
+    -> (3, 'Arjun', 'Reddy', '1995-11-30', 'Male', '9845012340', 'arjun.reddy@example.com', 'Hyderabad, Telangana'),
+    -> (4, 'Priya', 'Nair', '1998-04-12', 'Female', '9876043211', 'priya.nair@example.com', 'Kochi, Kerala'),
+    -> (5, 'Amit', 'Verma', '1992-03-25', 'Male', '9898123456', 'amit.verma@example.com', 'Delhi'),
+    -> (6, 'Radhika', 'Joshi', '1997-07-17', 'Female', '9812345099', 'radhika.joshi@example.com', 'Bangalore, Karnataka'),
+    -> (7, 'Kunal', 'Deshmukh', '1996-02-14', 'Male', '9745212345', 'kunal.deshmukh@example.com', 'Nagpur, Maharashtra'),
+    -> (8, 'Meera', 'Kulkarni', '1994-09-08', 'Female', '9987451230', 'meera.kulkarni@example.com', 'Pune, Maharashtra'),
+    -> (9, 'Vikram', 'Singh', '1988-12-10', 'Male', '9876501234', 'vikram.singh@example.com', 'Jaipur, Rajasthan'),
+    -> (10, 'Ananya', 'Ghosh', '1999-06-19', 'Female', '9801234567', 'ananya.ghosh@example.com', 'Kolkata, West Bengal'),
+    -> (11, 'Ravi', 'Kumar', '1993-07-11', 'Male', '9876703451', 'ravi.kumar@example.com', 'Patna, Bihar'),
+    -> (12, 'Divya', 'Shetty', '1995-08-22', 'Female', '9823401299', 'divya.shetty@example.com', 'Mangalore, Karnataka'),
+    -> (13, 'Harshit', 'Mehta', '1997-01-04', 'Male', '9988123094', 'harshit.mehta@example.com', 'Ahmedabad, Gujarat'),
+    -> (14, 'Tanya', 'Bhatt', '1998-11-15', 'Female', '9877543210', 'tanya.bhatt@example.com', 'Surat, Gujarat'),
+    -> (15, 'Rohit', 'Jain', '1996-10-10', 'Male', '9998887776', 'rohit.jain@example.com', 'Indore, MP'),
+    -> (16, 'Ayesha', 'Khan', '2001-03-03', 'Female', '9812234567', 'ayesha.khan@example.com', 'Lucknow, UP'),
+    -> (17, 'Suresh', 'Pillai', '1989-02-12', 'Male', '9874012349', 'suresh.pillai@example.com', 'Trivandrum, Kerala'),
+    -> (18, 'Komal', 'Choudhary', '1994-05-27', 'Female', '9822001456', 'komal.choudhary@example.com', 'Udaipur, Rajasthan'),
+    -> (19, 'Yash', 'Thakur', '1993-04-04', 'Male', '9755123490', 'yash.thakur@example.com', 'Bhopal, MP'),
+    -> (20, 'Nisha', 'Saxena', '1999-12-01', 'Female', '9867543212', 'nisha.saxena@example.com', 'Kanpur, UP');
+Query OK, 20 rows affected (0.01 sec)
+Records: 20  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO DOCTOR (doctor_id, first_name, last_name, specialization, mobile_number, email) VALUES
+    -> (1, 'Amit', 'Verma', 'Cardiologist', '9812345678', 'amit.verma@hospital.in'),
+    -> (2, 'Priya', 'Nair', 'General Physician', '9823456781', 'priya.nair@hospital.in'),
+    -> (3, 'Rohan', 'Joshi', 'Orthopedic', '9898989898', 'rohan.joshi@hospital.in'),
+    -> (4, 'Snehal', 'Kulkarni', 'Dermatologist', '9765432109', 'snehal.kulkarni@hospital.in'),
+    -> (5, 'Samir', 'Shah', 'Neurologist', '9845123456', 'samir.shah@hospital.in');
+Query OK, 5 rows affected (0.00 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO INSURANCE (insurance_id, patient_id, provider_name, policy_number, coverage_start, coverage_end) VALUES
+    -> (1, 1, 'LIC Health Plus', 'LIC1001', '2024-01-01', '2025-01-01'),
+    -> (2, 3, 'Star Health', 'STAR9001', '2023-06-15', '2024-06-15'),
+    -> (3, 5, 'HDFC Ergo', 'HDFC202312', '2024-02-01', '2025-02-01'),
+    -> (4, 8, 'ICICI Lombard', 'ICICI4455', '2024-01-10', '2025-01-10'),
+    -> (5, 10, 'Tata AIG', 'TATA9988', '2023-12-20', '2024-12-20'),
+    -> (6, 12, 'Star Health', 'STAR2023A', '2024-03-01', '2025-03-01'),
+    -> (7, 15, 'HDFC Ergo', 'HDFC5566', '2024-01-15', '2025-01-15'),
+    -> (8, 17, 'LIC Care', 'LIC7788', '2023-11-01', '2024-11-01'),
+    -> (9, 19, 'ICICI Lombard', 'ICICI3003', '2024-02-05', '2025-02-05'),
+    -> (10, 20, 'Star Health', 'STAR4412', '2024-04-01', '2025-04-01');
+Query OK, 10 rows affected (0.01 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO ENCOUNTER (encounter_id, patient_id, doctor_id, encounter_date, encounter_type, notes) VALUES
+    -> (1, 1, 2, '2024-02-01', 'OPD', 'Fever and cold'),
+    -> (2, 2, 1, '2024-02-02', 'OPD', 'Chest pain'),
+    -> (3, 3, 3, '2024-02-03', 'OPD', 'Knee pain'),
+    -> (4, 4, 5, '2024-02-04', 'OPD', 'Migraine issues'),
+    -> (5, 5, 4, '2024-02-05', 'OPD', 'Skin rash'),
+    -> (6, 6, 2, '2024-02-06', 'OPD', 'Weakness'),
+    -> (7, 7, 3, '2024-02-07', 'OPD', 'Shoulder pain'),
+    -> (8, 8, 1, '2024-02-08', 'OPD', 'High BP'),
+    -> (9, 9, 5, '2024-02-09', 'Emergency', 'Head injury'),
+    -> (10, 10, 4, '2024-02-10', 'OPD', 'Acne treatment'),
+    -> (11, 11, 1, '2024-02-11', 'OPD', 'Chest discomfort'),
+    -> (12, 12, 3, '2024-02-12', 'OPD', 'Back pain'),
+    -> (13, 13, 5, '2024-02-13', 'OPD', 'Dizziness'),
+    -> (14, 14, 2, '2024-02-14', 'OPD', 'Viral fever'),
+    -> (15, 15, 4, '2024-02-15', 'OPD', 'Skin allergy'),
+    -> (16, 16, 3, '2024-02-16', 'OPD', 'Leg fracture follow-up'),
+    -> (17, 17, 1, '2024-02-17', 'OPD', 'Heart palpitations'),
+    -> (18, 18, 2, '2024-02-18', 'OPD', 'Throat infection'),
+    -> (19, 19, 5, '2024-02-19', 'OPD', 'Migraine'),
+    -> (20, 20, 3, '2024-02-20', 'OPD', 'Muscle cramps');
+Query OK, 20 rows affected (0.01 sec)
+Records: 20  Duplicates: 0  Warnings: 0
+
+
+mysql> INSERT INTO ENCOUNTER (encounter_id, patient_id, doctor_id, encounter_date, encounter_type, notes) VALUES
+    -> (21, 1, 2, '2024-03-05', 'Follow-up', 'Follow-up for fever'),
+    -> (22, 1, 3, '2024-04-10', 'OPD', 'Seasonal allergy'),
+    ->
+    -> (23, 2, 1, '2024-03-15', 'Emergency', 'Severe chest pain'),
+    -> (24, 2, 4, '2024-05-01', 'OPD', 'Routine check-up'),
+    ->
+    -> (25, 3, 3, '2024-03-20', 'OPD', 'Joint pain check'),
+    -> (26, 3, 5, '2024-04-12', 'Follow-up', 'Pain improved'),
+    ->
+    -> (27, 4, 2, '2024-03-25', 'OPD', 'Headache severity increased'),
+    ->
+    -> (28, 5, 1, '2024-03-28', 'Emergency', 'High BP spike'),
+    -> (29, 5, 4, '2024-05-10', 'OPD', 'Skin rash follow-up'),
+    ->
+    -> (30, 6, 2, '2024-03-30', 'OPD', 'Weakness evaluation'),
+    -> (31, 6, 1, '2024-04-25', 'Follow-up', 'Diet improvement check'),
+    ->
+    -> (32, 7, 3, '2024-04-02', 'OPD', 'Shoulder pain review'),
+    ->
+    -> (33, 8, 1, '2024-03-03', 'Emergency', 'High BP emergency'),
+    -> (34, 8, 5, '2024-04-14', 'OPD', 'Thyroid monitoring'),
+    ->
+    -> (35, 9, 5, '2024-03-07', 'OPD', 'Head injury follow-up'),
+    ->
+    -> (36, 10, 4, '2024-04-01', 'OPD', 'Skin treatment progress'),
+    ->
+    -> (37, 11, 1, '2024-03-05', 'OPD', 'Chest discomfort follow-up'),
+    ->
+    -> (38, 12, 3, '2024-04-10', 'OPD', 'Back pain physiotherapy'),
+    ->
+    -> (39, 13, 5, '2024-03-11', 'OPD', 'Dizziness evaluation'),
+    ->
+    -> (40, 14, 2, '2024-04-18', 'OPD', 'Body weakness'),
+    ->
+    -> (41, 15, 4, '2024-03-15', 'OPD', 'Allergy check-up'),
+    ->
+    -> (42, 16, 3, '2024-04-20', 'Follow-up', 'Fracture healing assessment'),
+    ->
+    -> (43, 17, 1, '2024-03-22', 'OPD', 'Heart monitoring'),
+    ->
+    -> (44, 18, 2, '2024-03-29', 'OPD', 'Throat infection improved'),
+    ->
+    -> (45, 19, 5, '2024-04-05', 'Follow-up', 'Migraine symptoms review'),
+    ->
+    -> (46, 20, 3, '2024-04-12', 'OPD', 'Muscle cramps follow-up');
+Query OK, 26 rows affected (0.01 sec)
+Records: 26  Duplicates: 0  Warnings: 0
+
+
+mysql> INSERT INTO MEDICAL_HISTORY (history_id, patient_id, condition_name, description, diagnosed_date, status) VALUES
+    -> (1, 1, 'Asthma', 'Chronic breathing issue', '2015-01-12', 'Active'),
+    -> (2, 3, 'Diabetes', 'Type 2 diabetes', '2020-05-01', 'Active'),
+    -> (3, 5, 'Hypertension', 'High blood pressure', '2019-03-20', 'Active'),
+    -> (4, 8, 'Thyroid', 'Hypothyroidism', '2021-02-15', 'Active'),
+    -> (5, 10, 'Migraines', 'Regular headache', '2022-08-21', 'Active'),
+    -> (6, 12, 'Back Pain', 'Disc issue', '2020-11-09', 'Active'),
+    -> (7, 14, 'Skin Allergy', 'Dust allergy', '2018-06-30', 'Active'),
+    -> (8, 15, 'Anxiety', 'Stress-related', '2023-05-11', 'Active'),
+    -> (9, 17, 'Heart Issues', 'Minor blockage', '2021-09-14', 'Active'),
+    -> (10, 19, 'Joint Pain', 'Arthritis symptoms', '2022-01-10', 'Active'),
+    -> (11, 2, 'PCOS', 'Hormonal imbalance', '2023-04-12', 'Active'),
+    -> (12, 4, 'Migraine', 'Severe headache', '2020-06-18', 'Active'),
+    -> (13, 6, 'Low BP', 'Blood pressure drops', '2019-09-09', 'Active'),
+    -> (14, 7, 'Eye Issues', 'Weak eyesight', '2017-02-28', 'Active'),
+    -> (15, 9, 'Allergy', 'Food allergy', '2023-03-22', 'Active');
+Query OK, 15 rows affected (0.01 sec)
+Records: 15  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO MEDICATION (medication_id, name, form, strength, unit) VALUES
+    -> (1, 'Paracetamol', 'Tablet', '500', 'mg'),
+    -> (2, 'Azithral', 'Tablet', '250', 'mg'),
+    -> (3, 'Aciloc', 'Tablet', '150', 'mg'),
+    -> (4, 'Cetzine', 'Tablet', '10', 'mg'),
+    -> (5, 'Metformin', 'Tablet', '500', 'mg'),
+    -> (6, 'Atorvastatin', 'Tablet', '20', 'mg'),
+    -> (7, 'ORS Solution', 'Liquid', '200', 'ml'),
+    -> (8, 'Betadine', 'Liquid', '100', 'ml'),
+    -> (9, 'Ibuprofen', 'Tablet', '400', 'mg'),
+    -> (10, 'Pantoprazole', 'Tablet', '40', 'mg');
+Query OK, 10 rows affected (0.01 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO PRESCRIPTION (prescription_id, encounter_id, prescription_date) VALUES
+    -> (1,1,'2024-02-01'), (2,2,'2024-02-02'), (3,3,'2024-02-03'),
+    -> (4,4,'2024-02-04'), (5,5,'2024-02-05'), (6,6,'2024-02-06'),
+    -> (7,7,'2024-02-07'), (8,8,'2024-02-08'), (9,9,'2024-02-09'),
+    -> (10,10,'2024-02-10'), (11,11,'2024-02-11'), (12,12,'2024-02-12'),
+    -> (13,13,'2024-02-13'), (14,14,'2024-02-14'), (15,15,'2024-02-15'),
+    -> (16,16,'2024-02-16'), (17,17,'2024-02-17'), (18,18,'2024-02-18'),
+    -> (19,19,'2024-02-19'), (20,20,'2024-02-20');
+Query OK, 20 rows affected (0.01 sec)
+Records: 20  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO TEST_MASTER (test_id, test_name, category) VALUES
+    -> (1,'CBC','Blood'),
+    -> (2,'Lipid Profile','Blood'),
+    -> (3,'Blood Sugar','Blood'),
+    -> (4,'Thyroid Profile','Blood'),
+    -> (5,'X-Ray','Radiology'),
+    -> (6,'MRI','Radiology'),
+    -> (7,'ECG','Cardio'),
+    -> (8,'Urine Test','Pathology'),
+    -> (9,'LFT','Blood'),
+    -> (10,'KFT','Blood');
+Query OK, 10 rows affected (0.00 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO PATIENT_TEST (patient_test_id, encounter_id, test_id, test_date, status) VALUES
+    -> (1,1,1,'2024-02-01','Completed'),
+    -> (2,2,7,'2024-02-02','Completed'),
+    -> (3,3,5,'2024-02-03','Completed'),
+    -> (4,4,4,'2024-02-04','Completed'),
+    -> (5,5,8,'2024-02-05','Completed'),
+    -> (6,6,3,'2024-02-06','Completed'),
+    -> (7,7,5,'2024-02-07','Completed'),
+    -> (8,8,2,'2024-02-08','Completed'),
+    -> (9,9,6,'2024-02-09','Completed'),
+    -> (10,10,4,'2024-02-10','Completed'),
+    -> (11,11,7,'2024-02-11','Completed'),
+    -> (12,12,5,'2024-02-12','Completed'),
+    -> (13,13,9,'2024-02-13','Completed'),
+    -> (14,14,1,'2024-02-14','Completed'),
+    -> (15,15,8,'2024-02-15','Completed'),
+    -> (16,16,3,'2024-02-16','Completed'),
+    -> (17,17,7,'2024-02-17','Completed'),
+    -> (18,18,2,'2024-02-18','Completed'),
+    -> (19,19,4,'2024-02-19','Completed'),
+    -> (20,20,5,'2024-02-20','Completed');
+Query OK, 20 rows affected (0.01 sec)
+Records: 20  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO TEST_RESULT (result_id, patient_test_id, result_value, units, normal_range, result_date) VALUES
+    -> (1,1,'13.5','g/dL','12-16','2024-02-01'),
+    -> (2,2,'Normal','-','Normal','2024-02-02'),
+    -> (3,3,'Clear','-','Normal','2024-02-03'),
+    -> (4,4,'4.5','mIU/L','0.4-4.0','2024-02-04'),
+    -> (5,5,'Normal','-','Normal','2024-02-05'),
+    -> (6,6,'140','mg/dL','< 180','2024-02-06'),
+    -> (7,7,'Clear','-','Normal','2024-02-07'),
+    -> (8,8,'220','mg/dL','< 200','2024-02-08'),
+    -> (9,9,'Normal','-','Normal','2024-02-09'),
+    -> (10,10,'5.0','mIU/L','0.4-4.0','2024-02-10'),
+    -> (11,11,'Normal','-','Normal','2024-02-11'),
+    -> (12,12,'Clear','-','Normal','2024-02-12'),
+    -> (13,13,'Normal','-','Normal','2024-02-13'),
+    -> (14,14,'14.2','g/dL','12-16','2024-02-14'),
+    -> (15,15,'Normal','-','Normal','2024-02-15'),
+    -> (16,16,'150','mg/dL','< 180','2024-02-16'),
+    -> (17,17,'Normal','-','Normal','2024-02-17'),
+    -> (18,18,'230','mg/dL','< 200','2024-02-18'),
+    -> (19,19,'4.0','mIU/L','0.4-4.0','2024-02-19'),
+    -> (20,20,'Clear','-','Normal','2024-02-20');
+Query OK, 20 rows affected (0.01 sec)
+Records: 20  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO PROCEDURE_MASTER (procedure_id, procedure_name, description) VALUES
+    -> (1,'X-Ray','General X-Ray'),
+    -> (2,'MRI Scan','Magnetic Resonance Imaging'),
+    -> (3,'ECG','Electrocardiogram'),
+    -> (4,'Physiotherapy','Muscle relaxation therapy'),
+    -> (5,'Surgery','Minor surgical procedure'),
+    -> (6,'Ultrasound','Abdominal scan'),
+    -> (7,'Blood Pressure Check','Vital monitoring'),
+    -> (8,'Dressing','Wound care'),
+    -> (9,'Splinting','Bone support application'),
+    -> (10,'Eye Examination','Vision test');
+Query OK, 10 rows affected (0.01 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO PATIENT_PROCEDURE (patient_procedure_id, encounter_id, procedure_id, doctor_id, procedure_date, procedure_status) VALUES
+    -> (1,1,7,2,'2024-02-01','Done'),
+    -> (2,2,3,1,'2024-02-02','Done'),
+    -> (3,3,1,3,'2024-02-03','Done'),
+    -> (4,4,10,5,'2024-02-04','Done'),
+    -> (5,5,4,4,'2024-02-05','Done'),
+    -> (6,6,7,2,'2024-02-06','Done'),
+    -> (7,7,9,3,'2024-02-07','Done'),
+    -> (8,8,3,1,'2024-02-08','Done'),
+    -> (9,9,2,5,'2024-02-09','Done'),
+    -> (10,10,10,4,'2024-02-10','Done'),
+    -> (11,11,7,1,'2024-02-11','Done'),
+    -> (12,12,4,3,'2024-02-12','Done'),
+    -> (13,13,1,5,'2024-02-13','Done'),
+    -> (14,14,8,2,'2024-02-14','Done'),
+    -> (15,15,4,4,'2024-02-15','Done'),
+    -> (16,16,9,3,'2024-02-16','Done'),
+    -> (17,17,3,1,'2024-02-17','Done'),
+    -> (18,18,7,2,'2024-02-18','Done'),
+    -> (19,19,10,5,'2024-02-19','Done'),
+    -> (20,20,1,3,'2024-02-20','Done');
+Query OK, 20 rows affected (0.01 sec)
+Records: 20  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO PRESCRIPTION_ITEM
+    -> (item_id, prescription_id, medication_id, dosage, quantity_per_day, duration_days, instructions)
+    -> VALUES
+    -> (1, 1, 1, '1 Tablet', 3, 5, 'After food'),
+    -> (2, 2, 3, '1 Tablet', 2, 3, 'Before food'),
+    -> (3, 3, 2, '1 Tablet', 1, 3, 'After breakfast'),
+    -> (4, 4, 5, '1 Tablet', 2, 7, 'After dinner'),
+    -> (5, 5, 9, '1 Tablet', 2, 5, 'After food'),
+    -> (6, 6, 1, '1 Tablet', 3, 3, 'After food'),
+    -> (7, 7, 10, '1 Tablet', 1, 5, 'Before breakfast'),
+    -> (8, 8, 4, '1 Tablet', 1, 3, 'Night dose'),
+    -> (9, 9, 7, '20 ml', 2, 2, 'Sip slowly'),
+    -> (10, 10, 8, '10 ml', 1, 3, 'Apply externally'),
+    -> (11, 11, 5, '1 Tablet', 2, 10, 'Daily after meals'),
+    -> (12, 12, 3, '1 Tablet', 1, 2, 'Before dinner'),
+    -> (13, 13, 9, '1 Tablet', 2, 4, 'After lunch'),
+    -> (14, 14, 6, '1 Tablet', 1, 30, 'Morning dose'),
+    -> (15, 15, 4, '1 Tablet', 1, 3, 'Night allergy dose'),
+    -> (16, 16, 1, '1 Tablet', 2, 3, 'After food'),
+    -> (17, 17, 6, '1 Tablet', 1, 15, 'Daily before breakfast'),
+    -> (18, 18, 3, '1 Tablet', 2, 4, 'Before meals'),
+    -> (19, 19, 1, '1 Tablet', 3, 3, 'Headache relief'),
+    -> (20, 20, 7, '15 ml', 1, 2, 'Hydration');
+Query OK, 20 rows affected (0.00 sec)
+Records: 20  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql> SELECT
+    ->     p.first_name,
+    ->     COUNT(pi.medication_id) AS total_medications
+    -> FROM patient p
+    -> INNER JOIN encounter e
+    ->     ON p.patient_id = e.patient_id
+    -> INNER JOIN prescription pr
+    ->     ON e.encounter_id = pr.encounter_id
+    -> INNER JOIN prescription_item pi
+    ->     ON pr.prescription_id = pi.prescription_id
+    -> GROUP BY p.first_name
+    -> HAVING COUNT(pi.medication_id) >= 1;
++------------+-------------------+
+| first_name | total_medications |
++------------+-------------------+
+| Rahul      |                 1 |
+| Sneha      |                 1 |
+| Arjun      |                 1 |
+| Priya      |                 1 |
+| Amit       |                 1 |
+| Radhika    |                 1 |
+| Kunal      |                 1 |
+| Meera      |                 1 |
+| Vikram     |                 1 |
+| Ananya     |                 1 |
+| Ravi       |                 1 |
+| Divya      |                 1 |
+| Harshit    |                 1 |
+| Tanya      |                 1 |
+| Rohit      |                 1 |
+| Ayesha     |                 1 |
+| Suresh     |                 1 |
+| Komal      |                 1 |
+| Yash       |                 1 |
+| Nisha      |                 1 |
++------------+-------------------+
+20 rows in set (0.00 sec)
+
+
+mysql> SELECT
+    ->     p.first_name,
+    ->     m.name AS medication_name,
+    ->     pi.dosage,
+    ->     pi.quantity_per_day,
+    ->     pi.duration_days
+    -> FROM patient p
+    -> INNER JOIN encounter e
+    ->     ON p.patient_id = e.patient_id
+    -> INNER JOIN prescription pr
+    ->     ON e.encounter_id = pr.encounter_id
+    -> INNER JOIN prescription_item pi
+    ->     ON pr.prescription_id = pi.prescription_id
+    -> INNER JOIN medication m
+    ->     ON pi.medication_id = m.medication_id
+    -> WHERE p.first_name = 'Rahul';
++------------+-----------------+----------+------------------+---------------+
+| first_name | medication_name | dosage   | quantity_per_day | duration_days |
++------------+-----------------+----------+------------------+---------------+
+| Rahul      | Paracetamol     | 1 Tablet |                3 |             5 |
++------------+-----------------+----------+------------------+---------------+
+1 row in set (0.01 sec)
+
+
+mysql> select p.First_Name, count(e.encounter_id)
+    -> from patient p join encounter e
+    -> on p.patient_id = e.patient_id
+    -> group by p.patient_id
+    -> order by count(e.encounter_id) desc
+    -> limit 1;
++------------+-----------------------+
+| First_Name | count(e.encounter_id) |
++------------+-----------------------+
+| Rahul      |                     3 |
++------------+-----------------------+
+
+
+mysql> select d.first_name "Doctor Name", d.specialization, count(e.doctor_id) "no of Encounter perform"
+    -> from doctor d inner join encounter e
+    -> on d.doctor_id = e.doctor_id
+    -> group by e.doctor_id;
++-------------+-------------------+-------------------------+
+| Doctor Name | specialization    | no of Encounter perform |
++-------------+-------------------+-------------------------+
+| Amit        | Cardiologist      |                      10 |
+| Priya       | General Physician |                       9 |
+| Rohan       | Orthopedic        |                      11 |
+| Snehal      | Dermatologist     |                       7 |
+| Samir       | Neurologist       |                       9 |
++-------------+-------------------+-------------------------+
+
+mysql> select d.first_name "Doctor Name", d.specialization, count(e.doctor_id) "no of Encounter perform"
+    -> from doctor d inner join encounter e
+    -> on d.doctor_id = e.doctor_id
+    -> group by e.doctor_id;
++-------------+-------------------+-------------------------+
+| Doctor Name | specialization    | no of Encounter perform |
++-------------+-------------------+-------------------------+
+| Amit        | Cardiologist      |                       4 |
+| Priya       | General Physician |                       4 |
+| Rohan       | Orthopedic        |                       5 |
+| Snehal      | Dermatologist     |                       3 |
+| Samir       | Neurologist       |                       4 |
++-------------+-------------------+-------------------------+
+
+mysql> select p.first_name "Patient Name", m.condition_name, m.diagnosed_date
+    -> from patient p inner join medical_history m
+    -> on p.patient_id = m.patient_id
+    -> where m.status = "Active";
++--------------+----------------+----------------+
+| Patient Name | condition_name | diagnosed_date |
++--------------+----------------+----------------+
+| Rahul        | Asthma         | 2015-01-12     |
+| Arjun        | Diabetes       | 2020-05-01     |
+| Amit         | Hypertension   | 2019-03-20     |
+| Meera        | Thyroid        | 2021-02-15     |
+| Ananya       | Migraines      | 2022-08-21     |
+| Divya        | Back Pain      | 2020-11-09     |
+| Tanya        | Skin Allergy   | 2018-06-30     |
+| Rohit        | Anxiety        | 2023-05-11     |
+| Suresh       | Heart Issues   | 2021-09-14     |
+| Yash         | Joint Pain     | 2022-01-10     |
+| Sneha        | PCOS           | 2023-04-12     |
+| Priya        | Migraine       | 2020-06-18     |
+| Radhika      | Low BP         | 2019-09-09     |
+| Kunal        | Eye Issues     | 2017-02-28     |
+| Vikram       | Allergy        | 2023-03-22     |
++--------------+----------------+----------------+
+
+
+mysql> SELECT
+    ->     m.name "Medication Name",
+    ->     COUNT(pi.prescription_id) "Prescription times"
+    -> FROM prescription_item pi inner join medication m
+    -> on pi.mediation_id = m.medication_id
+    -> group by m.medication_id
+    -> having count(m.medication_id)>3;
+ERROR 1054 (42S22): Unknown column 'pi.mediation_id' in 'on clause'
+mysql> SELECT
+    ->     m.name "Medication Name",
+    ->     COUNT(pi.medication_id) "Prescription times"
+    -> FROM prescription_item pi inner join medication m
+    -> on pi.medication_id = m.medication_id
+    -> group by m.medication_id
+    -> having count(m.medication_id)>3;
++-----------------+--------------------+
+| Medication Name | Prescription times |
++-----------------+--------------------+
+| Paracetamol     |                  4 |
++-----------------+--------------------+
+1 row in set (0.01 sec)
+
+
+mysql> select d.first_name "Doctor Name", count(distinct p.patient_id) as no_of_patients
+    -> from doctor d join encounter e
+    -> on d.doctor_id = e.doctor_id
+    -> join patient p
+    -> on p.patient_id = e.patient_id
+    -> group by d.doctor_id;
++-------------+----------------+
+| Doctor Name | no_of_patients |
++-------------+----------------+
+| Amit        |              6 |
+| Priya       |              5 |
+| Rohan       |              6 |
+| Snehal      |              4 |
+| Samir       |              6 |
++-------------+----------------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT
+    ->     pm.procedure_name,
+    ->     pp.procedure_date,
+    ->     e.encounter_id,
+    ->     p.first_name AS patient_name
+    -> FROM encounter e
+    -> JOIN patient p
+    ->     ON e.patient_id = p.patient_id
+    -> JOIN patient_procedure pp
+    ->     ON e.encounter_id = pp.encounter_id
+    -> JOIN procedure_master pm
+    ->     ON pm.procedure_id = pp.procedure_id
+    -> LEFT JOIN prescription pr
+    ->     ON e.encounter_id = pr.encounter_id
+    -> LEFT JOIN prescription_item pi
+    ->     ON pr.prescription_id = pi.prescription_id
+    -> WHERE pi.prescription_id IS NULL;
+Empty set (0.00 sec)
+
+mysql> select p.first_name
+    -> from patient p left join encounter e
+    -> on p.patient_id = e.patient_id
+    -> where e.encounter_id is null;
+Empty set (0.00 sec)
+
+mysql> SELECT
+    ->     e.encounter_id,
+    ->     e.encounter_date,
+    ->     d.first_name AS doctor_name,
+    ->     d.specialization
+    -> FROM doctor d
+    -> RIGHT JOIN encounter e
+    ->     ON d.doctor_id = e.doctor_id;
+
+
+mysql> SELECT
+    ->     e.encounter_id,
+    ->     e.encounter_date,
+    ->     p.first_name AS patient_name
+    -> FROM encounter e
+    -> JOIN patient p
+    ->     ON e.patient_id = p.patient_id
+    -> LEFT JOIN prescription pr
+    ->     ON e.encounter_id = pr.encounter_id
+    -> WHERE pr.prescription_id IS NULL;
+
+
+mysql> select d.first_name "Doctor Name", count(pp.procedure_id) "Total no of procedures"
+    -> from doctor d join patient_procedure pp
+    -> on d.doctor_id = pp.doctor_id
+    -> join procedure_master pm
+    -> on pm.procedure_id = pp.procedure_id
+    -> group by pp.doctor_id
+    -> order by "Total no of procedures" desc;
++-------------+------------------------+
+| Doctor Name | Total no of procedures |
++-------------+------------------------+
+| Amit        |                      4 |
+| Priya       |                      4 |
+| Rohan       |                      5 |
+| Snehal      |                      3 |
+| Samir       |                      4 |
++-------------+------------------------+
+5 rows in set (0.00 sec)
+
+mysql> select d.first_name "Doctor Name", count(pp.procedure_id) Total_no_of_procedures
+    -> from doctor d join patient_procedure pp
+    -> on d.doctor_id = pp.doctor_id
+    -> join procedure_master pm
+    -> on pm.procedure_id = pp.procedure_id
+    -> group by pp.doctor_id
+    -> order by "Total no of procedures" desc;
++-------------+------------------------+
+| Doctor Name | Total_no_of_procedures |
++-------------+------------------------+
+| Amit        |                      4 |
+| Priya       |                      4 |
+| Rohan       |                      5 |
+| Snehal      |                      3 |
+| Samir       |                      4 |
++-------------+------------------------+
+
+
+mysql> SELECT
+    ->     d.first_name AS doctor_name,
+    ->     pm.procedure_name,
+    ->     COUNT(pp.procedure_id) AS total_procedures
+    -> FROM doctor d
+    -> JOIN patient_procedure pp
+    ->     ON d.doctor_id = pp.doctor_id
+    -> JOIN procedure_master pm
+    ->     ON pm.procedure_id = pp.procedure_id
+    -> GROUP BY d.doctor_id, pm.procedure_id;
+
+mysql> select d.first_name "Doctor Name", count(e.encounter_id) "Total no of encounters"
+    -> from doctor d join encounter e
+    -> on d.doctor_id = e.doctor_id
+    -> group by d.first_name;
++-------------+------------------------+
+| Doctor Name | Total no of encounters |
++-------------+------------------------+
+| Amit        |                     10 |
+| Priya       |                      9 |
+| Rohan       |                     11 |
+| Snehal      |                      7 |
+| Samir       |                      9 |
++-------------+------------------------+
+
+mysql> select d.first_name "Doctor Name", count(e.encounter_id) "Total no of encounters"
+    -> from doctor d join encounter e
+    -> on d.doctor_id = e.doctor_id
+    -> group by d.doctor_id;
++-------------+------------------------+
+| Doctor Name | Total no of encounters |
++-------------+------------------------+
+| Amit        |                     10 |
+| Priya       |                      9 |
+| Rohan       |                     11 |
+| Snehal      |                      7 |
+| Samir       |                      9 |
++-------------+------------------------+
+5 rows in set (0.00 sec)
+
+mysql> select p.first_name , count(pr.prescription_id)
+    -> from patient p join encounter e
+    -> on p.patient_id = e.patient_id
+    -> join prescription pr
+    -> on pr.encounter_id = e.encounter_id
+    -> group by p.first_name;
+
+mysql> select d.first_name "Doctor Name", count(e.encounter_id) "Total no of encounters"
+    -> from doctor d join encounter e
+    -> on d.doctor_id = e.doctor_id
+    -> group by encounter_id;
+
+mysql> select p.first_name, condition_name, description, year(diagnosed_date)
+    -> from patient p join medical_history m
+    -> on p.patient_id = m.patient_id
+    -> where month(diagnosed_date) = 2;
++------------+----------------+----------------+----------------------+
+| first_name | condition_name | description    | year(diagnosed_date) |
++------------+----------------+----------------+----------------------+
+| Meera      | Thyroid        | Hypothyroidism |                 2021 |
+| Kunal      | Eye Issues     | Weak eyesight  |                 2017 |
++------------+----------------+----------------+----------------------+
+2 rows in set (0.00 sec)
+
+mysql> select p.first_name, condition_name, description, year(diagnosed_date)
+    -> from patient p join medical_history m
+    -> on p.patient_id = m.patient_id
+    -> where month(diagnosed_date) = 2;
++------------+----------------+----------------+----------------------+
+| first_name | condition_name | description    | year(diagnosed_date) |
++------------+----------------+----------------+----------------------+
+| Meera      | Thyroid        | Hypothyroidism |                 2021 |
+| Kunal      | Eye Issues     | Weak eyesight  |                 2017 |
++------------+----------------+----------------+----------------------+
+2 rows in set (0.00 sec)
+
+mysql> select p.first_name, condition_name, description, year(diagnosed_date)
+    -> from patient p join medical_history m
+    -> on m.patient_id = p.patient_id
+    -> where month(diagnosed_date) = 2
+    -> order by year(diagnosed_date);
++------------+----------------+----------------+----------------------+
+| first_name | condition_name | description    | year(diagnosed_date) |
++------------+----------------+----------------+----------------------+
+| Kunal      | Eye Issues     | Weak eyesight  |                 2017 |
+| Meera      | Thyroid        | Hypothyroidism |                 2021 |
++------------+----------------+----------------+----------------------+
+
+
+mysql> select p.first_name, pp.procedure_date, pm.procedure_name
+    -> from patient p join encounter e
+    -> on p.patient_id = e.patient_id
+    -> join patient_procedure pp
+    -> on pp.encounter_id = e.encounter_id
+    -> join procedure_master pm
+    -> on pp.procedure_id = pm.procedure_id;
+
+mysql> select p.first_name 'Patient Name', tm.test_name, tr.result_date
+    -> from patient p join encounter e
+    -> on p.patient_id = e.patient_id
+    -> join patient_test pt
+    -> on pt.encounter_id = e.encounter_id
+    -> join test_master tm
+    -> on tm.test_id = pt.test_id
+    -> join test_result tr
+    -> on tr.patient_test_id = pt.patient_test_id;
+
+mysql> select m.name "Medication Name", pr.prescription_id
+    -> from prescription pr join prescription_item pi
+    -> on pr.prescription_id = pi.prescription_id
+    -> join medication m
+    -> on pi.medication_id = m.medication_id;
+
+mysql> select pr.prescription_id, p.first_name "Paient Name", d.First_name "Doctor name"
+    -> from patient p join encounter e
+    -> on p.patient_id = e.patient_id
+    -> join doctor d
+    -> on d.doctor_id = e.doctor_id
+    -> join prescription pr
+    -> on pr.encounter_id = e.encounter_id;
+
+mysql> select p.first_name,d.first_name,e.encounter_date from patient p inner join encounter e
+    -> on p.patient_id = e.patient_id
+    -> inner join doctor d
+    -> on d.doctor_id = e.doctor_id;
++------------+------------+-----------
+
+mysql> select p.first_name,d.first_name from patient p inner join encounter e
+    -> on p.patient_id = e.patient_id
+    -> inner join doctor d
+    -> on d.doctor_id = e.doctor_id;
++------------+------------+
+
+SELF JOIN
+mysql> SELECT
+    ->     p1.patient_id AS patient1_id,
+    ->     p1.first_name AS patient1_name,
+    ->     p2.patient_id AS patient2_id,
+    ->     p2.first_name AS patient2_name,
+    ->     p1.dob
+    -> FROM patient p1
+    -> JOIN patient p2
+    ->     ON p1.dob = p2.dob
+    ->     AND p1.patient_id <> p2.patient_id
+    -> ORDER BY p1.dob;
+Empty set (0.00 sec)
+
+mysql> select d.first_name "Doctor name", count(distinct e.patient_id) as no_of_patient
+    -> from doctor d join encounter e
+    -> on d.doctor_id = e.doctor_id
+    -> group by d.doctor_id;
++-------------+---------------+
+| Doctor name | no_of_patient |
++-------------+---------------+
+| Amit        |             6 |
+| Priya       |             5 |
+| Rohan       |             6 |
+| Snehal      |             4 |
+| Samir       |             6 |
++-------------+---------------+
